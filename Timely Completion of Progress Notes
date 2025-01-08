@@ -2,7 +2,9 @@
 Title: Timely Completion of Progress Notes
 Author(s): Ben M
 Date Created: 12/4/2024
-Updates: 
+Updates: 12/19/2024 - Commented out the section of code that excludes
+	weekends.  This is because a lot of the programs doing PN perform
+	them 24/7 (i.e. crisis services).
 *****************************************************************/
 
 DROP TABLE IF EXISTS #T1_ProgressNotes
@@ -11,7 +13,7 @@ SELECT clientvisit_id, P.program_code + ' ' + P.program_desc AS Program, rev_tim
 	emp_id, UPPER(CV.emp_name) AS emp_name, visittype_id, visittype, rev_timeout,
 	signature_datetime, 
 	DATEDIFF(DD, CV.rev_timeout, CV.signature_datetime)
-	- (DATEDIFF(WK, CV.rev_timeout, CV.signature_datetime) * 2)
+	--- (DATEDIFF(WK, CV.rev_timeout, CV.signature_datetime) * 2)  --uncomment if you want to exclude weekends.
 	- CASE WHEN DATEPART(DW, CV.rev_timeout) = 1 THEN 1 ELSE 0 END
 	+ CASE WHEN DATEPART(DW, CV.signature_datetime) = 1 THEN 1 ELSE 0 END 
 	- (SELECT COUNT(holiday_date) FROM Curated.dbo.ValeoHolidays AS h WHERE h.holiday_date BETWEEN CV.rev_timeout AND CV.signature_datetime)
